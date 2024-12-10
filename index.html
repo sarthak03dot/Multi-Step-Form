@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Step Form</title>
+  <style>
+    .form-step {
+      display: none;
+    }
+    .form-step.active {
+      display: block;
+    }
+    .button-group {
+      margin-top: 20px;
+    }
+ 
+  </style>
+</head>
+<body>
+
+  <form id="multiStepForm">
+    <!-- 1 -->
+    <div class="form-step active" id="step1">
+      <h2>Personal Information</h2>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <!--  2 -->
+    <div class="form-step" id="step2">
+      <h2>Address Details</h2>
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required>
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city" required>
+    </div>
+
+    <!--  3 -->
+    <div class="form-step" id="step3">
+      <h2>Preview & Submit</h2>
+      <p><strong>Name:</strong> <span id="reviewName"></span></p>
+      <p><strong>Email:</strong> <span id="reviewEmail"></span></p>
+      <p><strong>Address:</strong> <span id="reviewAddress"></span></p>
+      <p><strong>City:</strong> <span id="reviewCity"></span></p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+      <button type="button" id="prevBtn">Previous</button>
+      <button type="button" id="nextBtn">Next</button>
+    </div>
+  </form>
+
+  <script>
+    const formSteps = document.querySelectorAll('.form-step');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const form = document.getElementById('multiStepForm');
+
+    let currentStep = 0;
+    
+
+    function updateFormSteps() {
+      formSteps.forEach((step, index) => {
+        step.classList.toggle('active', index === currentStep);
+      });
+
+     
+
+      // Update Buttons Visibility
+      prevBtn.style.display = currentStep === 0 ? 'none' : 'inline-block';
+      nextBtn.textContent = currentStep === formSteps.length - 1 ? 'Submit' : 'Next';
+    }
+
+    function validateStep() {
+      const currentFields = formSteps[currentStep].querySelectorAll('input');
+      for (const field of currentFields) {
+        if (!field.checkValidity()) {
+          alert(`Please fill out the ${field.name} field.`);
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function reviewFormData() {
+      document.getElementById('reviewName').textContent = form.name.value;
+      document.getElementById('reviewEmail').textContent = form.email.value;
+      document.getElementById('reviewAddress').textContent = form.address.value;
+      document.getElementById('reviewCity').textContent = form.city.value;
+    }
+
+    async function submitFormData() {
+      const formData = {
+        name: form.name.value,
+        email: form.email.value,
+        address: form.address.value,
+        city: form.city.value,
+      };
+
+      try {
+        const response = await fetch('http://localhost:5000/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          alert('Form Submitted Successfully!');
+          form.reset();
+          currentStep = 0;
+          updateFormSteps();
+        } else {
+          alert('Failed to submit the form.');
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred. Please try again.');
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < formSteps.length - 1) {
+        if (validateStep()) {
+          currentStep++;
+          if (currentStep === formSteps.length - 1) reviewFormData();
+          updateFormSteps();
+        }
+      } else {
+        // Submit the form
+        submitFormData();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateFormSteps();
+      }
+    });
+
+    // Initialize
+    updateFormSteps();
+  </script>
+</body>
+</html>
