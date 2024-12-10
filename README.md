@@ -1,4 +1,4 @@
-# Multi-Step Form in React
+# Multi-Step Form
 
 This project demonstrates how to create a multi-step form . It allows users to fill out a form in multiple stages, collecting information in a structured and interactive way.
 
