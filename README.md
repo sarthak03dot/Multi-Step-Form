@@ -33,8 +33,8 @@ Let me know if you need further adjustments!
    Clone this repository to your local machine.
 
    ```bash
-   git clone <repository_url>
-   cd <project_folder>
+   git clone https://github.com/sarthak03dot/Multi-Step-Form.git
+   cd Multi-Step-Form
 
 
 2. **Live form link**:
